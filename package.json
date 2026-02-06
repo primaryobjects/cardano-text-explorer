@@ -1,0 +1,13 @@
+{
+  "name": "cardano-meta",
+  "version": "1.0.0",
+  "description": "Cardano Metadata Explorer",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Static site - no build required'",
+    "start": "echo 'Static site - use index.html'"
+  },
+  "keywords": ["cardano", "blockchain", "metadata"],
+  "author": "",
+  "license": "MIT"
+}

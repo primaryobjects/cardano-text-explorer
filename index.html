@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cardano Metadata Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050816;
+      --card: #111827;
+      --accent: #38bdf8;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --error: #f97373;
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #0f172a 0, #020617 55%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(16px);
+    }
+
+    header {
+      margin-bottom: 16px;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--muted);
+    }
+
+    .panel {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: var(--radius);
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      margin-bottom: 12px;
+    }
+
+    .panel-title {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field label {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: #0b1120;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--muted);
+    }
+
+    .status {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .status.error {
+      color: var(--error);
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .results-header h2 {
+      font-size: 0.95rem;
+    }
+
+    .results-header span {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .result-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .tx-card {
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.95));
+      border-radius: var(--radius);
+      padding: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tx-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .tx-hash {
+      font-size: 0.75rem;
+      word-break: break-all;
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .tx-hash:hover {
+      color: var(--text);
+      text-decoration: underline;
+    }
+
+    .tx-meta-count {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(56, 189, 248, 0.6);
+      color: var(--accent);
+    }
+
+    .meta-item {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 8px;
+      padding: 6px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      font-size: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .meta-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .meta-text {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .meta-key {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .footer-note {
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    @media (min-width: 640px) {
+      .form-row {
+        flex-direction: row;
+      }
+      .field {
+        flex: 1;
+      }
+    }
+
+    button.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Cardano Metadata Explorer</h1>
+      <p>Fetch the latest transactions and surface any metadata text embedded on-chain.</p>
+      <div class="badge-row">
+        <span class="badge">Blockfrost API</span>
+        <span class="badge">Mobile‑first</span>
+        <span class="badge">Live chain data</span>
+      </div>
+    </header>
+
+    <section class="panel">
+      <div class="panel-title">Connection</div>
+      <div class="form-row">
+        <div class="field">
+          <label for="network">Network</label>
+          <select id="network">
+            <option value="mainnet">Mainnet</option>
+            <!--<option value="preprod">Preprod</option>-->
+            <option value="preview">Preview</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="labelFilter">Metadata Label (optional)</label>
+          <input
+            id="labelFilter"
+            type="text"
+            placeholder="e.g. 674, 1990, myLabel"
+            autocomplete="off"
+          />
+        </div>
+        <div class="field">
+          <label for="limit">Tx count (latest)</label>
+          <input id="limit" type="number" min="1" max="20" value="20" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="fetchBtn">
+          <span>Search</span>
+        </button>
+
+        <div class="field" style="margin-top:12px;">
+          <label>
+            <input type="checkbox" id="liveToggle" />
+            Enable Live Updates
+          </label>
+        </div>
+
+        <div class="field" style="margin-top:12px;">
+          <label>
+            <input type="checkbox" id="tailToggle" />
+            Auto-scroll to newest results
+          </label>
+        </div>
+      </div>
+      <div id="status" class="status"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel" style="margin-top:12px;">
+        <div class="panel-title">View Options</div>
+        <div class="actions" style="gap:12px; flex-wrap:wrap;">
+          <button id="viewCardsBtn">Card View</button>
+          <button id="viewUniqueBtn">Unique Metadata</button>
+        </div>
+      </div>
+
+      <!-- Unique metadata textarea (hidden by default) -->
+      <div id="uniqueContainer" class="panel" style="display:none;">
+        <div class="panel-title">Unique Metadata</div>
+        <textarea id="uniqueText" style="
+          width:100%;
+          height:200px;
+          border-radius:12px;
+          padding:10px;
+          background:#0f172a;
+          color:#e5e7eb;
+          border:1px solid rgba(148,163,184,0.4);
+          font-size:0.8rem;
+          white-space:pre-wrap;
+        "></textarea>
+      </div>
+
+      <div class="results-header">
+        <h2>Results</h2>
+        <span id="summary">No data yet.</span>
+      </div>
+      <div id="results" class="result-list"></div>
+      <button id="loadMoreBtn" style="margin-top:10px; display:none;">
+        Load More
+      </button>
+    </section>
+  </div>
+
+  <script>
+    const networkSelect = document.getElementById("network");
+    const limitInput = document.getElementById("limit");
+    const fetchBtn = document.getElementById("fetchBtn");
+    const statusEl = document.getElementById("status");
+    const resultsEl = document.getElementById("results");
+    const summaryEl = document.getElementById("summary");
+    const labelFilterInput = document.getElementById("labelFilter");
+    const viewCardsBtn = document.getElementById("viewCardsBtn");
+    const viewUniqueBtn = document.getElementById("viewUniqueBtn");
+    const uniqueContainer = document.getElementById("uniqueContainer");
+    const uniqueText = document.getElementById("uniqueText");
+    const liveToggle = document.getElementById("liveToggle");
+    const tailToggle = document.getElementById("tailToggle");
+    let liveInterval = null;
+
+    let labelPage = 1;
+    let currentLabel = null;
+
+    function buildUniqueMetadataDump(txWithMetadata) {
+      const set = new Set();
+
+      txWithMetadata.forEach(tx => {
+        tx.metadata.forEach(meta => {
+          if (meta.text) {
+            meta.text.split("\n").forEach(line => {
+              const trimmed = line.trim();
+              if (trimmed.length > 0) set.add(trimmed);
+            });
+          }
+        });
+      });
+
+      return Array.from(set).join("\n");
+    }
+
+    function getBaseUrl(network) {
+      // Blockfrost Cardano endpoints
+      switch (network) {
+        case "preprod":
+          return "https://cardano-preprod.blockfrost.io/api/v0";
+        case "preview":
+          return "https://cardano-preview.blockfrost.io/api/v0";
+        case "mainnet":
+        default:
+          return "https://cardano-mainnet.blockfrost.io/api/v0";
+      }
+    }
+
+    function getCardanoscanUrl(network, hash) {
+      switch (network) {
+        case "preview":
+          return `https://preview.cardanoscan.io/transaction/${hash}`;
+        case "preprod":
+          return `https://preprod.cardanoscan.io/transaction/${hash}`;
+        case "mainnet":
+        default:
+          return `https://cardanoscan.io/transaction/${hash}`;
+      }
+    }
+
+    async function fetchJson(url) {
+      const network = networkSelect.value;
+
+      const res = await fetch(
+        `/.netlify/functions/blockfrost-proxy?url=${encodeURIComponent(url)}&network=${network}`
+      );
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`HTTP ${res.status}: ${text || res.statusText}`);
+      }
+
+      return res.json();
+    }
+
+    function extractTextFromMetadataItem(item) {
+      // item: { label, json_metadata }
+      const label = item.label;
+      const json = item.json_metadata;
+
+      const texts = [];
+
+      function walk(node) {
+        if (node == null) return;
+        if (typeof node === "string") {
+          texts.push(node);
+        } else if (Array.isArray(node)) {
+          node.forEach(walk);
+        } else if (typeof node === "object") {
+          Object.values(node).forEach(walk);
+        }
+      }
+
+      walk(json);
+
+      return {
+        label,
+        text: texts.join("\n"),
+      };
+    }
+
+    function renderResults(txWithMetadata) {
+      resultsEl.innerHTML = "";
+
+      // Save last results globally so view mode can switch
+      window._lastResults = txWithMetadata;
+
+      // Update unique metadata textarea
+      const uniqueDump = buildUniqueMetadataDump(txWithMetadata);
+      uniqueText.value = uniqueDump;
+
+      if (!txWithMetadata.length) {
+        summaryEl.textContent = "No metadata text found in the latest transactions.";
+        return;
+      }
+
+      summaryEl.textContent = `${txWithMetadata.length} transaction(s) with metadata text.`;
+
+      txWithMetadata.forEach((tx) => {
+        const card = document.createElement("div");
+        card.className = "tx-card";
+
+        const header = document.createElement("div");
+        header.className = "tx-header";
+
+                const hashEl = document.createElement("a");
+        hashEl.className = "tx-hash";
+        hashEl.href = getCardanoscanUrl(networkSelect.value, tx.hash);
+        hashEl.textContent = tx.hash;
+        hashEl.target = "_blank";
+        hashEl.rel = "noopener noreferrer";
+
+        const countEl = document.createElement("div");
+        countEl.className = "tx-meta-count";
+        countEl.textContent = `${tx.metadata.length} metadata item(s)`;
+
+        header.appendChild(hashEl);
+        header.appendChild(countEl);
+        card.appendChild(header);
+
+        tx.metadata.forEach((meta) => {
+          const metaCard = document.createElement("div");
+          metaCard.className = "meta-item";
+
+          const labelEl = document.createElement("div");
+          labelEl.className = "meta-label";
+          labelEl.textContent = `Label: ${meta.label}`;
+
+          const keyEl = document.createElement("div");
+          keyEl.className = "meta-key";
+          keyEl.textContent = meta.text ? "Extracted text:" : "No string values found in this metadata.";
+
+          const textEl = document.createElement("div");
+          textEl.className = "meta-text";
+          textEl.textContent = meta.text || "";
+
+          metaCard.appendChild(labelEl);
+          metaCard.appendChild(keyEl);
+          if (meta.text) metaCard.appendChild(textEl);
+
+          card.appendChild(metaCard);
+        });
+
+        resultsEl.appendChild(card);
+      });
+    }
+
+    async function fetchLatestTxHashes(baseUrl, limit) {
+      let txs = [];
+      let block = await fetchJson(`${baseUrl}/blocks/latest`);
+
+      while (txs.length < limit) {
+        const blockTxs = await fetchJson(
+          `${baseUrl}/blocks/${block.hash}/txs`
+        );
+
+        txs.push(...blockTxs);
+
+        if (!block.previous_block) break;
+
+        block = await fetchJson(
+          `${baseUrl}/blocks/${block.previous_block}`
+        );
+      }
+
+      return txs.slice(0, limit);
+    }
+
+    async function fetchLatestMetadata(silent = false) {
+      if (fetchBtn.disabled && !silent) return;
+
+      if (!silent) {
+        fetchBtn.disabled = true;
+        fetchBtn.textContent = "Searching…";
+      }
+
+      const network = networkSelect.value;
+      const limit = Math.min(Math.max(parseInt(limitInput.value || "20", 10), 1), 50);
+      const labelFilter = labelFilterInput.value.trim();
+
+      if (!silent) {
+        fetchBtn.disabled = true;
+        fetchBtn.textContent = "Searching…";
+        fetchBtn.classList.add("loading");
+      }
+
+      statusEl.classList.remove("error");
+      if (!silent) {
+        statusEl.textContent = "Fetching latest transactions…";
+        summaryEl.textContent = "Loading…";
+        resultsEl.innerHTML = "";
+      }
+
+      try {
+        const baseUrl = getBaseUrl(network);
+
+        // If user entered a label, use Blockfrost's label search endpoint
+        if (labelFilter) {
+          if (!silent) {
+            statusEl.textContent = `Searching for label ${labelFilter} (page ${labelPage})…`;
+          }
+
+          // Reset pagination if new label
+          if (currentLabel !== labelFilter) {
+            currentLabel = labelFilter;
+            labelPage = 1;
+          }
+
+          const labelResults = await fetchJson(
+            `${baseUrl}/metadata/txs/labels/${labelFilter}?count=${limit}&page=${labelPage}&order=desc`
+          );
+
+          labelPage++; // next page for "Load more"
+
+          const txWithMetadata = labelResults.map((item) => {
+            const extracted = extractTextFromMetadataItem({
+              label: labelFilter,
+              json_metadata: item.json_metadata
+            });
+
+            return {
+              hash: item.tx_hash,
+              metadata: [extracted]
+            };
+          });
+
+          if (silent) {
+            // Only update UI if results changed
+            const oldDump = uniqueText.value.trim();
+            const newDump = buildUniqueMetadataDump(txWithMetadata).trim();
+
+            if (oldDump === newDump) {
+              return; // no change, skip UI update
+            }
+          }
+
+          renderResults(txWithMetadata);
+          if (!silent) {
+            statusEl.textContent = "Done.";
+            fetchBtn.disabled = false;
+          }
+
+          loadMoreBtn.style.display = "block";
+
+          return;
+        }
+
+        loadMoreBtn.style.display = "none";
+
+        const txHashes = await fetchLatestTxHashes(baseUrl, limit);
+
+        if (!Array.isArray(txHashes) || txHashes.length === 0) {
+          statusEl.textContent = "No transactions found in the latest block.";
+          summaryEl.textContent = "No transactions.";
+          fetchBtn.disabled = false;
+          return;
+        }
+
+        statusEl.textContent = `Found ${txHashes.length} txs in latest block. Fetching metadata…`;
+
+        const txWithMetadata = [];
+
+        // 3. For each tx, fetch metadata
+        let index = 0;
+        for (const hash of txHashes) {
+          index++;
+          // Always update status so live (silent) mode shows progress
+          statusEl.textContent = `Fetching metadata ${index}/${txHashes.length}…`;
+
+          try {
+            const metadataItems = await fetchJson(
+              `${baseUrl}/txs/${hash}/metadata`
+            );
+
+            if (Array.isArray(metadataItems) && metadataItems.length > 0) {
+              let processed = metadataItems
+                .map(extractTextFromMetadataItem)
+                .filter((m) => m.text && m.text.trim().length > 0);
+
+              // Fix label filter: allow numeric or string match
+              if (labelFilter) {
+                processed = processed.filter((m) =>
+                  m.label.toString() === labelFilter.toString()
+                );
+              }
+
+              if (processed.length > 0) {
+                txWithMetadata.push({
+                  hash,
+                  metadata: processed,
+                });
+              }
+            }
+          } catch (err) {
+            // Ignore individual tx errors, continue
+            console.warn("Metadata fetch failed for tx", hash, err);
+          }
+        }
+
+        if (silent) {
+          // In live mode, prepend any new transactions to existing results
+          const previous = window._lastResults || [];
+          const existing = new Set(previous.map((r) => r.hash));
+          const newOnes = txWithMetadata.filter((t) => !existing.has(t.hash));
+
+          if (newOnes.length === 0) {
+            statusEl.textContent = "No new transactions.";
+            return;
+          }
+
+          const combined = [...newOnes, ...previous];
+          renderResults(combined);
+          statusEl.textContent = `Added ${newOnes.length} new transaction(s).`;
+          if (tailToggle && tailToggle.checked) {
+            // Scroll to show the newest (prepended) item
+            resultsEl.firstChild?.scrollIntoView({ behavior: "smooth" });
+          }
+        } else {
+          renderResults(txWithMetadata);
+          statusEl.textContent = "Done.";
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = `Error: ${err.message}`;
+        statusEl.classList.add("error");
+        summaryEl.textContent = "Request failed.";
+      } finally {
+        if (!silent) {
+          fetchBtn.disabled = false;
+          fetchBtn.textContent = "Search";
+          fetchBtn.classList.remove("loading");
+        }
+      }
+    }
+
+    fetchBtn.addEventListener("click", () => fetchLatestMetadata(false));
+
+    viewCardsBtn.addEventListener("click", () => {
+      uniqueContainer.style.display = "none";
+      resultsEl.style.display = "flex";
+    });
+
+    viewUniqueBtn.addEventListener("click", () => {
+      resultsEl.style.display = "none";
+      uniqueContainer.style.display = "block";
+    });
+
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+    loadMoreBtn.addEventListener("click", async () => {
+      if (!currentLabel) return;
+
+      const network = networkSelect.value;
+      const baseUrl = getBaseUrl(network);
+      const limit = parseInt(limitInput.value || "20", 10);
+
+      const labelResults = await fetchJson(
+        `${baseUrl}/metadata/txs/labels/${currentLabel}?count=${limit}&page=${labelPage}&order=desc`
+      );
+
+      labelPage++;
+
+      const newTx = labelResults.map((item) => {
+        const extracted = extractTextFromMetadataItem({
+          label: currentLabel,
+          json_metadata: item.json_metadata
+        });
+
+        return {
+          hash: item.tx_hash,
+          metadata: [extracted]
+        };
+      });
+
+      // Append to existing results
+      const combined = [...window._lastResults, ...newTx];
+      renderResults(combined);
+    });
+
+    liveToggle.addEventListener("change", () => {
+      if (liveToggle.checked) {
+        // Start live updates
+        liveInterval = setInterval(() => {
+          fetchLatestMetadata(true); // pass "silent" mode
+        }, 20000); // 20 seconds
+      } else {
+        // Stop live updates
+        clearInterval(liveInterval);
+        liveInterval = null;
+      }
+    });
+  </script>
+</body>
+</html>
