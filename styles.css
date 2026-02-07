@@ -251,10 +251,6 @@ button:disabled {
 }
 
 .footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
   background: rgba(15, 23, 42, 0.9);
   border-top: 1px solid rgba(148, 163, 184, 0.3);
   padding: 12px 16px;
