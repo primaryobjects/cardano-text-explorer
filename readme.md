@@ -160,7 +160,7 @@ The app uses a Netlify function (`blockfrost-proxy.js`) to proxy requests to Blo
 ### Common Issues
 
 1. **API Key Not Set**
-   - Ensure `BLOCKFROST_API_KEY` is configured in Netlify
+   - Ensure `BLOCKFROST_MAIN_KEY` and `BLOCKFROST_PREVIEW_KEY` are configured in Netlify
    - Check environment variables locally
 
 2. **CORS Errors**
