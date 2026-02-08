@@ -5,9 +5,18 @@
   "main": "index.html",
   "scripts": {
     "build": "echo 'Static site - no build required'",
-    "start": "echo 'Static site - use index.html'"
+    "start": "echo 'Static site - use index.html'",
+    "dev": "netlify dev",
+    "init": "netlify link"
   },
-  "keywords": ["cardano", "blockchain", "metadata"],
+  "keywords": [
+    "cardano",
+    "blockchain",
+    "metadata"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "netlify-cli": "^23.15.1"
+  }
 }

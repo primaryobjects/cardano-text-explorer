@@ -103,23 +103,28 @@ The app uses a Netlify function (`blockfrost-proxy.js`) to proxy requests to Blo
 
 1. **Install Dependencies**
    ```bash
-   npm install -g netlify-cli
+   npm install --dev
    ```
 
 2. **Set Environment Variable**
-   ```bash
-   export BLOCKFROST_API_KEY=your_api_key_here
+   Edit the file `.env` to add your BlockFrost API keys.
+   ```
+   BLOCKFROST_MAIN_KEY=your_api_key_here
+   BLOCKFROST_PREVIEW_KEY=your_api_key_here
    ```
 
-3. **Start Development Server**
+3. **Link Netlify Project**
    ```bash
-   netlify dev
+   npm run init
    ```
 
-4. **Test the App**
-   - Open `http://localhost:8888`
-   - Test all features
-   - Check browser console for errors
+4. **Start Development Server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Test the App**
+   - Open `http://localhost:3999`
 
 ### Testing
 
