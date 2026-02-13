@@ -192,6 +192,12 @@ header p {
   box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
 }
 
+/* Highlight date inputs when they have values */
+.field input[type="date"]:not(:placeholder-shown) {
+  border-color: rgba(16, 185, 129, 0.6);
+  background: rgba(16, 185, 129, 0.05);
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -380,4 +386,246 @@ button:disabled {
 button.loading {
   opacity: 0.7;
   pointer-events: none;
+}
+
+/* Export buttons */
+button#exportCSVBtn,
+button#exportJSONBtn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+button#saveSearchBtn {
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  color: white;
+}
+
+/* Help button */
+.help-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.help-btn:hover {
+  background: rgba(148, 163, 184, 0.3);
+  color: var(--accent);
+}
+
+/* Dropdown for saved searches */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+  background: rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: var(--text);
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.dropbtn:hover {
+  background: rgba(148, 163, 184, 0.3);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: rgba(15, 23, 42, 0.98);
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.dropdown-content a {
+  color: var(--text);
+  padding: 8px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.dropdown-content a:hover {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent);
+}
+
+.dropdown-content .empty-message {
+  color: var(--muted);
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.dropdown-content .delete-btn {
+  float: right;
+  color: var(--error);
+  font-size: 0.8rem;
+  padding: 4px;
+  margin-right: 8px;
+}
+
+.dropdown-content .delete-btn:hover {
+  color: #f87171;
+}
+
+/* Help Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: var(--radius);
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.modal-close:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--error);
+}
+
+.shortcuts-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.shortcuts-table tr {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.shortcuts-table td {
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+
+.shortcuts-table td:first-child {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+kbd {
+  background: rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: var(--text);
+}
+
+.features-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.features-list li {
+  margin-bottom: 8px;
+}
+
+.features-list strong {
+  color: var(--accent);
+}
+
+/* Statistics panel */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.stat-item {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--accent);
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }

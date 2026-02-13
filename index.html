@@ -45,17 +45,51 @@
           <input id="limit" type="number" min="1" max="20" value="20" />
         </div>
       </div>
+
+      <!-- Enhanced Search Options -->
+      <div class="form-row" style="margin-top:12px;">
+        <div class="field">
+          <label for="regexFilter">Text Regex (optional)</label>
+          <input
+            id="regexFilter"
+            type="text"
+            placeholder="e.g. ^Hello.*World$"
+            autocomplete="off"
+          />
+        </div>
+        <div class="field">
+          <label for="walletFilter">Wallet Address (optional)</label>
+          <input
+            id="walletFilter"
+            type="text"
+            placeholder="stake or address"
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label for="dateFrom">Date From (optional)</label>
+          <input id="dateFrom" type="date" />
+        </div>
+        <div class="field">
+          <label for="dateTo">Date To (optional)</label>
+          <input id="dateTo" type="date" />
+        </div>
+      </div>
+
       <div class="actions">
         <button id="fetchBtn">
           <span>Search</span>
-        </button>
+      </button>
 
         <div class="field" style="margin-top:12px;">
           <label>
             <input type="checkbox" id="liveToggle" />
             Enable Live Updates
           </label>
-        </div>
+  </div>
 
         <div class="field" style="margin-top:12px;">
           <label>
@@ -70,9 +104,17 @@
     <section class="panel">
       <div class="panel" style="margin-top:12px;">
         <div class="panel-title">View Options</div>
-        <div class="actions" style="gap:12px; flex-wrap:wrap;">
+                <div class="actions" style="gap:12px; flex-wrap:wrap;">
           <button id="viewCardsBtn">Card View</button>
           <button id="viewUniqueBtn">Unique Metadata</button>
+                    <button id="exportCSVBtn">Export CSV</button>
+          <button id="exportJSONBtn">Export JSON</button>
+                    <button id="saveSearchBtn">Save Search</button>
+                    <div class="dropdown">
+            <button id="loadSearchBtn" class="dropbtn">Load Saved ▾</button>
+            <div id="savedSearchesDropdown" class="dropdown-content"></div>
+          </div>
+          <button id="helpBtn" class="help-btn">?</button>
         </div>
       </div>
 
@@ -92,6 +134,11 @@
         "></textarea>
       </div>
 
+      <!-- Statistics Panel -->
+      <div id="statsPanel" class="panel" style="display:none;">
+        <div class="panel-title">Statistics</div>
+        <div class="stats-grid" id="statsGrid"></div>
+      </div>
       <div class="results-header">
         <h2>Results</h2>
         <span id="summary">No data yet.</span>
@@ -102,14 +149,54 @@
       </button>
     </section>
 
-    <!-- Sticky GitHub link fixed to viewport bottom-right -->
+        <!-- Sticky GitHub link fixed to viewport bottom-right -->
     <a class="github-sticky" href="https://github.com/primaryobjects/cardano-text-explorer" target="_blank" rel="noopener noreferrer" aria-label="View on GitHub">
       <i class="fa-brands fa-github" aria-hidden="true"></i>
       <span>View on GitHub</span>
     </a>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Keyboard Shortcuts</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <table class="shortcuts-table">
+            <tr>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td>
+              <td>Save current search</td>
+            </tr>
+            <tr>
+              <td><kbd>Ctrl</kbd> + <kbd>E</kbd></td>
+              <td>Export to CSV</td>
+            </tr>
+            <tr>
+              <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd></td>
+              <td>Export to JSON</td>
+            </tr>
+            <tr>
+              <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
+              <td>Focus label filter</td>
+            </tr>
+          </table>
+          <h4>Features</h4>
+          <ul class="features-list">
+            <li><strong>Regex Filter:</strong> Search metadata text with regular expressions</li>
+            <li><strong>Wallet Filter:</strong> Filter transactions by wallet address</li>
+            <li><strong>Date Range:</strong> Filter by transaction date</li>
+            <li><strong>Export:</strong> Download results as CSV or JSON</li>
+            <li><strong>Save Search:</strong> Save filter configurations for reuse</li>
+            <li><strong>Statistics:</strong> Real-time stats on results</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
   </div>
 
   <script src="script.js" defer></script>
 </body>
 </html>
+
