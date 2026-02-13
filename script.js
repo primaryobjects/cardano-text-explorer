@@ -81,6 +81,118 @@ function buildUniqueMetadataDump(txWithMetadata) {
   return Array.from(set).join("\n");
 }
 
+// Copy icon SVG
+const copyIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+const checkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+// Column visibility preferences (loaded from localStorage)
+let columnPrefs = {
+  txHash: true,
+  metaCount: true,
+  label: true,
+  text: true,
+  blockTime: true,
+  wallet: false  // new: wallet addresses (off by default to avoid extra API calls)
+};
+
+function loadColumnPrefs() {
+  try {
+    const saved = localStorage.getItem('cardano-explorer-columns');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      columnPrefs = { ...columnPrefs, ...parsed };
+    }
+  } catch (e) {
+    console.warn('Failed to load column preferences', e);
+  }
+  // Update checkboxes
+  document.querySelectorAll('#customizeDropdown input[type="checkbox"]').forEach(cb => {
+    cb.checked = columnPrefs[cb.dataset.field] !== false;
+  });
+}
+
+function saveColumnPrefs() {
+  try {
+    localStorage.setItem('cardano-explorer-columns', JSON.stringify(columnPrefs));
+  } catch (e) {
+    console.warn('Failed to save column preferences', e);
+  }
+}
+
+function applyColumnPrefs() {
+  // Read checkboxes
+  document.querySelectorAll('#customizeDropdown input[type="checkbox"]').forEach(cb => {
+    columnPrefs[cb.dataset.field] = cb.checked;
+  });
+  saveColumnPrefs();
+  // Re-render if we have results
+  if (window._lastResults) {
+    renderResults(window._lastResults);
+  }
+}
+
+function resetColumnPrefs() {
+  columnPrefs = {
+    txHash: true,
+    metaCount: true,
+    label: true,
+    text: true,
+    blockTime: true
+  };
+  document.querySelectorAll('#customizeDropdown input[type="checkbox"]').forEach(cb => {
+    cb.checked = columnPrefs[cb.dataset.field];
+  });
+  saveColumnPrefs();
+  if (window._lastResults) {
+    renderResults(window._lastResults);
+  }
+}
+
+// Copy functionality
+async function copyToClipboard(text, btn = null) {
+  try {
+    await navigator.clipboard.writeText(text);
+    if (btn) {
+      const original = btn.innerHTML;
+      btn.innerHTML = checkIconSvg;
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = original;
+        btn.classList.remove('copied');
+      }, 1500);
+    }
+    return true;
+  } catch (err) {
+    console.warn('Copy failed', err);
+    return false;
+  }
+}
+
+function createCopyButton(text) {
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.type = 'button';
+  btn.title = 'Copy to clipboard';
+  btn.innerHTML = copyIconSvg;
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    copyToClipboard(text, btn);
+  });
+  return btn;
+}
+
+function formatBlockTime(timestamp) {
+  if (!timestamp) return '';
+  return new Date(timestamp * 1000).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+}
+
 function renderResults(txWithMetadata) {
   resultsEl.innerHTML = "";
 
@@ -102,43 +214,92 @@ function renderResults(txWithMetadata) {
     const card = document.createElement("div");
     card.className = "tx-card";
 
-    const header = document.createElement("div");
-    header.className = "tx-header";
+    // Header row with hash and count
+    if (columnPrefs.txHash || columnPrefs.metaCount) {
+      const header = document.createElement("div");
+      header.className = "tx-header";
 
-    const hashEl = document.createElement("a");
-    hashEl.className = "tx-hash";
-    hashEl.href = getCardanoscanUrl(networkSelect.value, tx.hash);
-    hashEl.textContent = tx.hash;
-    hashEl.target = "_blank";
-    hashEl.rel = "noopener noreferrer";
+      if (columnPrefs.txHash) {
+        const hashWrapper = document.createElement("div");
+        hashWrapper.className = "field-with-copy";
+        const hashEl = document.createElement("a");
+        hashEl.className = "tx-hash";
+        hashEl.href = getCardanoscanUrl(networkSelect.value, tx.hash);
+        hashEl.textContent = tx.hash;
+        hashEl.target = "_blank";
+        hashEl.rel = "noopener noreferrer";
+        hashWrapper.appendChild(hashEl);
+        hashWrapper.appendChild(createCopyButton(tx.hash));
+        header.appendChild(hashWrapper);
+      }
 
-    const countEl = document.createElement("div");
-    countEl.className = "tx-meta-count";
-    countEl.textContent = `${tx.metadata.length} metadata item(s)`;
+      if (columnPrefs.metaCount) {
+        const countEl = document.createElement("div");
+        countEl.className = "tx-meta-count";
+        countEl.textContent = `${tx.metadata.length} metadata item(s)`;
+        header.appendChild(countEl);
+      }
 
-    header.appendChild(hashEl);
-    header.appendChild(countEl);
-    card.appendChild(header);
+      card.appendChild(header);
+    }
 
     tx.metadata.forEach((meta) => {
       const metaCard = document.createElement("div");
       metaCard.className = "meta-item";
 
-      const labelEl = document.createElement("div");
-      labelEl.className = "meta-label";
-      labelEl.textContent = `Label: ${meta.label}`;
+      // Label with copy
+      if (columnPrefs.label) {
+        const labelWrapper = document.createElement("div");
+        labelWrapper.className = "field-with-copy meta-label";
+        labelWrapper.textContent = `Label: ${meta.label}`;
+        labelWrapper.appendChild(createCopyButton(meta.label.toString()));
+        metaCard.appendChild(labelWrapper);
+      }
 
-      const keyEl = document.createElement("div");
-      keyEl.className = "meta-key";
-      keyEl.textContent = meta.text ? "Extracted text:" : "No string values found in this metadata.";
+      // Key/Text
+      if (columnPrefs.text) {
+        const keyEl = document.createElement("div");
+        keyEl.className = "meta-key";
+        keyEl.textContent = meta.text ? "Extracted text:" : "No string values found in this metadata.";
 
-      const textEl = document.createElement("div");
-      textEl.className = "meta-text";
-      textEl.textContent = meta.text || "";
+        const textWrapper = document.createElement("div");
+        textWrapper.className = "field-with-copy meta-text";
+        textWrapper.textContent = meta.text || "";
+        if (meta.text) {
+          textWrapper.appendChild(createCopyButton(meta.text));
+        }
 
-      metaCard.appendChild(labelEl);
-      metaCard.appendChild(keyEl);
-      if (meta.text) metaCard.appendChild(textEl);
+        metaCard.appendChild(keyEl);
+        metaCard.appendChild(textWrapper);
+      }
+
+      // Block time with copy
+      if (columnPrefs.blockTime && tx.blockTime) {
+        const timeWrapper = document.createElement("div");
+        timeWrapper.className = "field-with-copy";
+        timeWrapper.style.fontSize = "0.7rem";
+        timeWrapper.style.color = "var(--muted)";
+        timeWrapper.style.marginTop = "4px";
+        timeWrapper.textContent = formatBlockTime(tx.blockTime);
+        timeWrapper.appendChild(createCopyButton(formatBlockTime(tx.blockTime)));
+        metaCard.appendChild(timeWrapper);
+      }
+
+      // Wallet addresses
+      if (columnPrefs.wallet && tx.addresses) {
+        const addrWrapper = document.createElement("div");
+        addrWrapper.className = "field-with-copy";
+        addrWrapper.style.fontSize = "0.7rem";
+        addrWrapper.style.color = "var(--accent)";
+        addrWrapper.style.marginTop = "4px";
+        addrWrapper.title = `Inputs: ${tx.addresses.inputs.join(', ')}\nOutputs: ${tx.addresses.outputs.join(', ')}`;
+        const addrText = formatAddresses(tx.addresses.inputs, 1);
+        addrWrapper.textContent = `Wallet: ${addrText}`;
+        if (tx.addresses.inputs.length > 0) {
+          addrWrapper.appendChild(createCopyButton(tx.addresses.inputs[0]));
+        }
+        metaCard.appendChild(addrWrapper);
+      }
 
       card.appendChild(metaCard);
     });
@@ -306,6 +467,42 @@ async function fetchTransactionDetails(baseUrl, txHash) {
   }
 }
 
+function extractAddressesFromTx(txDetails) {
+  if (!txDetails) return { inputs: [], outputs: [] };
+  const inputs = [];
+  const outputs = [];
+  if (Array.isArray(txDetails.inputs)) {
+    txDetails.inputs.forEach(input => {
+      if (input.address) inputs.push(input.address);
+    });
+  }
+  if (Array.isArray(txDetails.outputs)) {
+    txDetails.outputs.forEach(output => {
+      if (output.address) outputs.push(output.address);
+    });
+  }
+  return { inputs, outputs };
+}
+
+function formatAddresses(addresses, maxDisplay = 1) {
+  if (!addresses || addresses.length === 0) return '';
+  const display = addresses.slice(0, maxDisplay);
+  const more = addresses.length - maxDisplay;
+  const formatted = display.map(addr => addr.slice(0, 12) + '...').join(', ');
+  return more > 0 ? `${formatted} (+${more} more)` : formatted;
+}
+
+async function fetchAddressesForTransactions(baseUrl, txHashes) {
+  const addressesMap = new Map();
+  await Promise.all(
+    txHashes.map(async (tx) => {
+      const details = await fetchTransactionDetails(baseUrl, tx.hash);
+      addressesMap.set(tx.hash, extractAddressesFromTx(details));
+    })
+  );
+  return addressesMap;
+}
+
 async function fetchLatestMetadata(silent = false) {
   if (fetchBtn.disabled && !silent) return;
 
@@ -367,7 +564,7 @@ async function fetchLatestMetadata(silent = false) {
 
       labelPage++; // next page for "Load more"
 
-      const txWithMetadata = labelResults.map((item) => {
+      let txWithMetadata = labelResults.map((item) => {
         const extracted = extractTextFromMetadataItem({
           label: labelFilter,
           json_metadata: item.json_metadata
@@ -378,6 +575,15 @@ async function fetchLatestMetadata(silent = false) {
           metadata: [extracted]
         };
       });
+
+      // Fetch wallet addresses if column is enabled
+      if (columnPrefs.wallet) {
+        const addressMap = await fetchAddressesForTransactions(baseUrl, txWithMetadata);
+        txWithMetadata = txWithMetadata.map(tx => ({
+          ...tx,
+          addresses: addressMap.get(tx.hash) || { inputs: [], outputs: [] }
+        }));
+      }
 
       if (silent) {
         // Only update UI if results changed
@@ -471,35 +677,27 @@ async function fetchLatestMetadata(silent = false) {
       }
     }
 
-    // Apply wallet filter - needs to fetch transaction details
+    // Fetch wallet addresses if column is enabled (or wallet filter is active)
+    const needAddresses = columnPrefs.wallet || !!walletFilter;
+    if (needAddresses) {
+      statusEl.textContent = `Fetching addresses for ${filteredResults.length} transaction(s)...`;
+      const addressMap = await fetchAddressesForTransactions(baseUrl, filteredResults);
+      filteredResults = filteredResults.map(tx => ({
+        ...tx,
+        addresses: addressMap.get(tx.hash) || { inputs: [], outputs: [] }
+      }));
+    }
+
+    // Apply wallet filter - uses already-fetched addresses when available
     if (walletFilter) {
       const walletLower = walletFilter.toLowerCase();
-      const filteredWithWallet = [];
-
-      for (const tx of filteredResults) {
-        try {
-          const txDetails = await fetchTransactionDetails(baseUrl, tx.hash);
-          if (!txDetails) continue;
-
-          const hasWallet =
-            txDetails.inputs?.some(input =>
-              (input.address && input.address.toLowerCase().includes(walletLower)) ||
-              (input.payment_cred && input.payment_cred.toLowerCase().includes(walletLower))
-            ) ||
-            txDetails.outputs?.some(output =>
-              (output.address && output.address.toLowerCase().includes(walletLower)) ||
-              (output.payment_cred && output.payment_cred.toLowerCase().includes(walletLower))
-            );
-
-          if (hasWallet) {
-            filteredWithWallet.push(tx);
-          }
-        } catch (err) {
-          console.warn("Error checking wallet for tx", tx.hash, err);
-        }
-      }
-
-      filteredResults = filteredWithWallet;
+      filteredResults = filteredResults.filter(tx => {
+        const { inputs, outputs } = tx.addresses || { inputs: [], outputs: [] };
+        return (
+          inputs.some(addr => addr.toLowerCase().includes(walletLower)) ||
+          outputs.some(addr => addr.toLowerCase().includes(walletLower))
+        );
+      });
     }
 
     if (silent) {
@@ -571,6 +769,9 @@ let liveInterval = null;
 let labelPage = 1;
 let currentLabel = null;
 
+// Load column preferences on startup
+loadColumnPrefs();
+
 fetchBtn.addEventListener("click", () => fetchLatestMetadata(false));
 
 viewCardsBtn.addEventListener("click", () => {
@@ -609,6 +810,14 @@ loadMoreBtn.addEventListener("click", async () => {
       metadata: [extracted]
     };
   });
+
+  // Fetch wallet addresses if column is enabled
+  if (columnPrefs.wallet) {
+    const addressMap = await fetchAddressesForTransactions(baseUrl, newTx);
+    newTx.forEach(tx => {
+      tx.addresses = addressMap.get(tx.hash) || { inputs: [], outputs: [] };
+    });
+  }
 
   // Append to existing results
   const combined = [...window._lastResults, ...newTx];
@@ -880,8 +1089,8 @@ if (loadSearchBtn && savedSearchesDropdown) {
   });
 
     // Close dropdown when clicking outside
-  document.addEventListener('click', () => {
-    if (savedSearchesDropdown.style.display === 'block') {
+  document.addEventListener('click', (e) => {
+    if (savedSearchesDropdown.style.display === 'block' && !savedSearchesDropdown.contains(e.target) && e.target !== loadSearchBtn) {
       savedSearchesDropdown.style.display = 'none';
     }
   });
@@ -889,6 +1098,44 @@ if (loadSearchBtn && savedSearchesDropdown) {
   // Initial population
   refreshSavedSearchesDropdown();
 }
+
+// Customize dropdown and preferences
+const customizeBtn = document.getElementById('customizeBtn');
+const customizeDropdown = document.getElementById('customizeDropdown');
+
+if (customizeBtn && customizeDropdown) {
+  customizeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    customizeDropdown.style.display =
+      customizeDropdown.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (customizeDropdown.style.display === 'block' && !customizeDropdown.contains(e.target)) {
+      customizeDropdown.style.display = 'none';
+    }
+  });
+
+  // Column checkboxes - apply changes immediately
+  customizeDropdown.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      applyColumnPrefs();
+    });
+  });
+}
+
+// Copy area button (for unique metadata)
+document.addEventListener('click', (e) => {
+  const copyAreaBtn = e.target.closest('.copy-area-btn');
+  if (copyAreaBtn) {
+    const targetId = copyAreaBtn.dataset.target;
+    const textarea = document.getElementById(targetId);
+    if (textarea) {
+      copyToClipboard(textarea.value, copyAreaBtn);
+    }
+  }
+});
 
 // Help modal functionality
 if (helpBtn && helpModal) {
