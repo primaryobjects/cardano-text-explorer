@@ -553,6 +553,15 @@ button:disabled {
   color: var(--accent);
   font-size: 1rem;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.donation-heart {
+  font-size: 1.1rem;
+  color: #ef4444;
 }
 
 .donation-content p {
@@ -565,7 +574,7 @@ button:disabled {
 .donation-address {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 8px 12px;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border);
@@ -575,47 +584,23 @@ button:disabled {
   justify-content: center;
 }
 
-.donation-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .donation-addr-text {
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 0.8rem;
-  color: var(--text);
-  word-break: break-all;
-  max-width: 400px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.donation-copy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
-  font-size: 0.75rem;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
+  color: var(--accent);
   cursor: pointer;
-  transition: background 0.2s;
-  margin-left: 8px;
-  opacity: 1;
+  transition: color 0.2s;
+  word-break: break-all;
 }
 
-.donation-copy-btn:hover {
-  background: var(--accent-hover);
+.donation-addr-text:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
 }
 
-.donation-copy-btn.copied {
-  background: var(--success);
+.donation-copy-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .donation-note {

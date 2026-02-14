@@ -1137,12 +1137,12 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Donation address copy button
+// Donation address click to copy
 document.addEventListener('click', (e) => {
-  const donateBtn = e.target.closest('.donation-copy-btn');
-  if (donateBtn) {
-    const address = donateBtn.dataset.copy;
-    copyToClipboard(address, donateBtn);
+  const donateAddr = e.target.closest('.donation-addr-text');
+  if (donateAddr) {
+    const address = donateAddr.dataset.copy;
+    copyToClipboard(address, donateAddr);
   }
 });
 
