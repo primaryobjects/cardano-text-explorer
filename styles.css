@@ -184,6 +184,21 @@ header {
   border-bottom: 1px solid var(--border);
 }
 
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.header-left {
+  flex: 1;
+}
+
+.header-right {
+  flex-shrink: 0;
+}
+
 header h1 {
   font-size: 1.6rem;
   font-weight: 700;
@@ -203,6 +218,73 @@ header p {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 12px;
+}
+
+/* Header donation */
+.donation-header {
+  text-align: right;
+}
+
+.donation-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.donation-addr-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.donation-addr-copy .donation-addr-text {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.75rem;
+  color: var(--text);
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.donation-addr-copy .copy-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+  padding: 4px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.donation-addr-copy:hover .copy-btn,
+.donation-addr-copy .copy-btn:focus {
+  opacity: 1;
+}
+
+.donation-addr-copy .copy-btn svg {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .header-top {
+    flex-direction: column;
+  }
+  .donation-header {
+    text-align: left;
+  }
+  .donation-addr-copy .donation-addr-text {
+    max-width: 200px;
+  }
 }
 
 .badge {
@@ -1070,3 +1152,4 @@ kbd {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+

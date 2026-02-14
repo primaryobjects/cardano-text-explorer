@@ -179,11 +179,11 @@ The app uses a Netlify function (`blockfrost-proxy.js`) to proxy requests to Blo
 
 ## Donate
 
-If you find this tool helpful, consider supporting its development with a Cardano donation:
+Support this project with a Cardano donation:
 
-**Address:** `addr1v9dudaytpa2anpn32namwpggeyvf9s44akv7c87l4uy28lstxpdjt`
+** ADA:** `addr1v9dudaytpa2anpn32namwpggeyvf9s44akv7c87l4uy28lstxpdjt`
 
-You can click the address directly in the app to copy it to your clipboard.
+(Hover over the address in the app header to reveal the copy button.)
 
 ## License
 

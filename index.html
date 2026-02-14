@@ -11,8 +11,23 @@
 <body>
   <div class="app">
     <header>
-      <h1>Cardano Text Explorer</h1>
-      <p>Fetch the latest transactions and surface any metadata text embedded on-chain.</p>
+      <div class="header-top">
+        <div class="header-left">
+          <h1>Cardano Text Explorer</h1>
+          <p>Fetch the latest transactions and surface any metadata text embedded on-chain.</p>
+        </div>
+        <div class="header-right">
+          <div class="donation-header">
+            <span class="donation-label">Support this project</span>
+            <div class="field-with-copy donation-addr-copy">
+              <code class="donation-addr-text" data-copy="addr1v9dudaytpa2anpn32namwpggeyvf9s44akv7c87l4uy28lstxpdjt">addr1v9dudaytpa2anpn32namwpggeyvf9s44akv7c87l4uy28lstxpdjt</code>
+              <button class="copy-btn" title="Copy address">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="badge-row">
         <span class="badge">Blockfrost API</span>
         <span class="badge">Mobile‑first</span>
@@ -184,19 +199,6 @@
       <i class="fa-brands fa-github" aria-hidden="true"></i>
       <span>View on GitHub</span>
     </a>
-
-    <!-- Donation section at bottom of page -->
-    <div class="donation-section">
-      <div class="donation-content">
-        <h3><i class="fa-solid fa-heart donation-heart" aria-hidden="true"></i> Support This Project</h3>
-        <p>If you find Cardano Text Explorer helpful, consider making a donation:</p>
-        <div class="donation-address">
-          <code class="donation-addr-text" title="Click to copy" data-copy="addr1v9dudaytpa2anpn32namwpggeyvf9s44akv7c87l4uy28lstxpdjt">addr1v9dudaytpa2anpn32namwpggeyvf9s44akv7c87l4uy28lstxpdjt</code>
-          <span class="donation-copy-hint"> (click to copy)</span>
-        </div>
-        <p class="donation-note">Click the address to copy it to your clipboard.</p>
-      </div>
-    </div>
 
     <!-- Help Modal -->
     <div id="helpModal" class="modal-overlay">
