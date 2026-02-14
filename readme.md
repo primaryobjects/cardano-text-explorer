@@ -1,5 +1,7 @@
 # Cardano Text Explorer
 
+[Demo](https://github.com/primaryobjects/cardano-text-explorer)
+
 A web application for fetching and exploring text embedded in Cardano blockchain transactions. This project surfaces human-readable text from on-chain metadata using the Blockfrost API.
 
 ![Cardano Text Explorer](screenshot.png)
