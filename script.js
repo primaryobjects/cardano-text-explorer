@@ -1137,6 +1137,15 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// Donation address copy button
+document.addEventListener('click', (e) => {
+  const donateBtn = e.target.closest('.donation-copy-btn');
+  if (donateBtn) {
+    const address = donateBtn.dataset.copy;
+    copyToClipboard(address, donateBtn);
+  }
+});
+
 // Help modal functionality
 if (helpBtn && helpModal) {
   helpBtn.addEventListener('click', () => {

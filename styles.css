@@ -538,6 +538,92 @@ button:disabled {
   font-size: 18px;
 }
 
+/* Donation section at bottom */
+.donation-section {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.donation-content h3 {
+  margin: 0 0 8px 0;
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.donation-content p {
+  margin: 0 0 12px 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.donation-address {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin: 8px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.donation-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.donation-addr-text {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  color: var(--text);
+  word-break: break-all;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.donation-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: 8px;
+  opacity: 1;
+}
+
+.donation-copy-btn:hover {
+  background: var(--accent-hover);
+}
+
+.donation-copy-btn.copied {
+  background: var(--success);
+}
+
+.donation-note {
+  margin: 12px 0 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
 /* Sticky Donation button */
 .donation-sticky {
   position: fixed;
