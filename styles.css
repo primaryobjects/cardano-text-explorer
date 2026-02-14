@@ -226,12 +226,20 @@ header p {
 }
 
 .donation-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
   font-size: 0.75rem;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 4px;
+}
+
+.donation-heart-icon {
+  color: #ef4444;
+  font-size: 0.85rem;
 }
 
 .donation-addr-copy {
