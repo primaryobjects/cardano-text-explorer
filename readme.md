@@ -177,6 +177,14 @@ The app uses a Netlify function (`blockfrost-proxy.js`) to proxy requests to Blo
    - Verify JavaScript is running
    - Check network requests
 
+## Donate
+
+If you find this tool helpful, consider supporting its development with a Cardano donation:
+
+[addr1v9dudaytpa2anpn32namwpggeyvf9s44akv7c87l4uy28lstxpdjt](cardano:addr1v9dudaytpa2anpn32namwpggeyvf9s44akv7c87l4uy28lstxpdjt)
+
+Or click the ❤️ button in the app's bottom-left corner.
+
 ## License
 
 MIT

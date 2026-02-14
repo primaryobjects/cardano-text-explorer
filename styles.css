@@ -533,8 +533,35 @@ button:disabled {
   fill: var(--accent);
 }
 
-.github-sticky .fa-brands {
+.github-sticky .fa-brands,
+.donation-sticky .fa-solid {
   font-size: 18px;
+}
+
+/* Sticky Donation button */
+.donation-sticky {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.donation-sticky:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 @media (min-width: 640px) {
